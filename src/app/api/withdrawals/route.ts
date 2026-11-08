@@ -1,0 +1,21 @@
+import { NextResponse } from "next/server";
+import { errMsg, getTelegramUser, supabaseAdmin } from "@/lib/server";
+import { getByCBalanceNano } from "@/lib/tonapi";
+import { TOKEN } from "@/lib/config";
+
+export async function POST(req: Request) {
+  try {
+    const user = await getTelegramUser(); const body = await req.json();
+    if (!/^\d+$/.test(String(body.amountNano || ""))) throw new Error("Invalid amount.");
+    const amount = BigInt(String(body.amountNano));
+    if (amount < TOKEN.minWithdrawalNano) throw new Error("Minimum withdrawal is 21 BYC.");
+    const db = supabaseAdmin();
+    const { data: prof, error: pe } = await db.from("profiles").select("connected_wallet,wallet_verified_at").eq("telegram_id", String(user.id)).single();
+    if (pe || !prof?.connected_wallet || !prof.wallet_verified_at) throw new Error("Connect and verify your TON wallet first.");
+    // Holding is read on-chain from the verified wallet; the client cannot supply it.
+    const holding = await getByCBalanceNano(prof.connected_wallet);
+    const { data, error } = await db.rpc("request_withdrawal", { p_telegram_id: String(user.id), p_amount_nano: amount.toString(), p_onchain_balance_nano: holding.toString() });
+    if (error) throw error;
+    return NextResponse.json({ withdrawal: data });
+  } catch (e) { return NextResponse.json({ error: errMsg(e, "Withdrawal failed") }, { status: 400 }); }
+}

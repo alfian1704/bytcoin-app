@@ -1,0 +1,14 @@
+import { NextResponse } from "next/server";
+import { errMsg, getTelegramUser, supabaseAdmin } from "@/lib/server";
+import { getByCInfo } from "@/lib/tonapi";
+// Returns the BYC jetton-wallet address + balance of the user's *verified* wallet (needed to build the sell-fee transfer).
+export async function GET() {
+  try {
+    const user = await getTelegramUser();
+    const { data, error } = await supabaseAdmin().from("profiles").select("connected_wallet").eq("telegram_id", String(user.id)).single();
+    if (error || !data?.connected_wallet) throw new Error("Connect and verify your TON wallet first.");
+    const info = await getByCInfo(data.connected_wallet);
+    if (!info.walletAddress) throw new Error("This wallet holds no BYC.");
+    return NextResponse.json({ walletAddress: info.walletAddress, balance: info.balance.toString() });
+  } catch (e) { return NextResponse.json({ error: errMsg(e, "Unable to load wallet") }, { status: 400 }); }
+}
