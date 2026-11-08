@@ -1,5 +1,6 @@
 "use client";
 "use client";
+"use client";
 import {useEffect,useState} from "react";
 import WebApp from "@twa-dev/sdk";
 import { toNano } from "@/lib/config";
