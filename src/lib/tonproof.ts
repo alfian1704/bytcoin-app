@@ -9,7 +9,6 @@ function secret() {
 }
 const mac = (body: string) => createHmac("sha256", secret()).update(body).digest("hex").slice(0, 32);
 
-/** Stateless, signed challenge: "<unix ts>.<random>.<mac>" (< 128 chars as TON Connect requires). */
 export function makePayload(): string {
   const body = `${Math.floor(Date.now() / 1000)}.${randomBytes(8).toString("hex")}`;
   return `${body}.${mac(body)}`;
@@ -23,19 +22,35 @@ export function checkPayload(payload: string, now = Math.floor(Date.now() / 1000
   return age >= -60 && age <= PROOF_TTL_SECONDS;
 }
 
+// FIX: Support both RAW (0:hex) and FRIENDLY (EQ/UQ) TON addresses
 export function parseRawAddress(addr: string): { workchain: number; hash: Buffer } {
-  const m = /^(-?\d+):([0-9a-fA-F]{64})$/.exec(addr || "");
-  if (!m) throw new Error("Invalid wallet address format.");
-  return { workchain: Number(m[1]), hash: Buffer.from(m[2], "hex") };
+  const rawMatch = /^(-?\d+):([0-9a-fA-F]{64})$/.exec(addr || "");
+  if (rawMatch) {
+    return { workchain: Number(rawMatch[1]), hash: Buffer.from(rawMatch[2], "hex") };
+  }
+  // Try friendly base64 (EQ, UQ, Ef, etc) - 36 bytes
+  try {
+    const clean = addr.trim();
+    const buf = Buffer.from(clean, "base64");
+    if (buf.length === 36) {
+      const workchain = buf[1] === 0xff ? -1 : buf[1];
+      const hash = buf.subarray(2, 34);
+      return { workchain, hash };
+    }
+  } catch {}
+  throw new Error("Invalid wallet address format.");
 }
-export const normalizeAddress = (addr: string) => { const a = parseRawAddress(addr); return `${a.workchain}:${a.hash.toString("hex")}`; };
+
+export const normalizeAddress = (addr: string) => { 
+  const a = parseRawAddress(addr); 
+  return `${a.workchain}:${a.hash.toString("hex").toLowerCase()}`; 
+};
 
 export type ProofInput = {
   address: string;
   proof: { timestamp: number; domain: { lengthBytes: number; value: string }; payload: string; signature: string };
 };
 
-/** Verifies the ed25519 signature of a ton_proof (TON Connect spec) against a known public key. */
 export function verifyProofSignature(input: ProofInput, publicKeyHex: string): boolean {
   const { workchain, hash } = parseRawAddress(input.address);
   const { timestamp, domain, payload, signature } = input.proof;
