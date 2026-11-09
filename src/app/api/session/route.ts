@@ -11,6 +11,14 @@ export async function GET() {
     if (error) throw error;
     const { data, error: e2 } = await db.rpc("get_profile", { p_tid: String(user.id) });
     if (e2) throw e2;
-    return NextResponse.json({ user: { id: user.id, first_name: user.first_name }, data });
+    const { data: activeSession } = await db
+      .from("mining_sessions")
+      .select("id, started_at, ends_at, status, reward_rate_nano_per_hour")
+      .eq("telegram_id", String(user.id))
+      .eq("status", "active")
+      .order("started_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    return NextResponse.json({ user: { id: user.id, first_name: user.first_name }, data: { ...data, session: activeSession || null } });
   } catch (e) { return NextResponse.json({ error: errMsg(e, "Unauthorized") }, { status: 401 }); }
 }
