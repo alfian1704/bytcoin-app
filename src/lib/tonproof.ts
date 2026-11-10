@@ -9,41 +9,39 @@ function secret() {
 }
 const mac = (body: string) => createHmac("sha256", secret()).update(body).digest("hex").slice(0, 32);
 
-export function makePayload(): string {
+// userId ikut ditandatangani, sehingga payload hanya sah untuk akun Telegram yang memintanya.
+export function makePayload(userId: string): string {
   const body = `${Math.floor(Date.now() / 1000)}.${randomBytes(8).toString("hex")}`;
-  return `${body}.${mac(body)}`;
+  return `${body}.${mac(`${body}.${userId}`)}`;
 }
-export function checkPayload(payload: string, now = Math.floor(Date.now() / 1000)): boolean {
+export function checkPayload(payload: string, userId: string, now = Math.floor(Date.now() / 1000)): boolean {
   const m = /^(\d{10})\.([0-9a-f]{16})\.([0-9a-f]{32})$/.exec(payload || "");
   if (!m) return false;
-  const a = Buffer.from(m[3]), b = Buffer.from(mac(`${m[1]}.${m[2]}`));
+  const a = Buffer.from(m[3]), b = Buffer.from(mac(`${m[1]}.${m[2]}.${userId}`));
   if (a.length !== b.length || !timingSafeEqual(a, b)) return false;
   const age = now - Number(m[1]);
   return age >= -60 && age <= PROOF_TTL_SECONDS;
 }
 
-// FIX: Support both RAW (0:hex) and FRIENDLY (EQ/UQ) TON addresses
+// Mendukung alamat RAW (0:hex) dan FRIENDLY (EQ/UQ).
 export function parseRawAddress(addr: string): { workchain: number; hash: Buffer } {
   const rawMatch = /^(-?\d+):([0-9a-fA-F]{64})$/.exec(addr || "");
   if (rawMatch) {
     return { workchain: Number(rawMatch[1]), hash: Buffer.from(rawMatch[2], "hex") };
   }
-  // Try friendly base64 (EQ, UQ, Ef, etc) - 36 bytes
   try {
-    const clean = addr.trim();
-    const buf = Buffer.from(clean, "base64");
+    const buf = Buffer.from((addr || "").trim(), "base64");
     if (buf.length === 36) {
       const workchain = buf[1] === 0xff ? -1 : buf[1];
-      const hash = buf.subarray(2, 34);
-      return { workchain, hash };
+      return { workchain, hash: buf.subarray(2, 34) };
     }
   } catch {}
   throw new Error("Invalid wallet address format.");
 }
 
-export const normalizeAddress = (addr: string) => { 
-  const a = parseRawAddress(addr); 
-  return `${a.workchain}:${a.hash.toString("hex").toLowerCase()}`; 
+export const normalizeAddress = (addr: string) => {
+  const a = parseRawAddress(addr);
+  return `${a.workchain}:${a.hash.toString("hex").toLowerCase()}`;
 };
 
 export type ProofInput = {
@@ -54,6 +52,7 @@ export type ProofInput = {
 export function verifyProofSignature(input: ProofInput, publicKeyHex: string): boolean {
   const { workchain, hash } = parseRawAddress(input.address);
   const { timestamp, domain, payload, signature } = input.proof;
+  if (!Number.isSafeInteger(timestamp) || timestamp < 0) return false;
   const domainBytes = Buffer.from(domain.value, "utf8");
   if (domain.lengthBytes !== domainBytes.length) return false;
   const wc = Buffer.alloc(4); wc.writeInt32BE(workchain);
