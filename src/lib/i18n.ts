@@ -13,7 +13,7 @@ export const T: Record<Lang, Dict> = {
     cycle: "Siklus mining", poolLeft: "Sisa pool", whitepaper: "Baca Whitepaper",
     tasks: "Pusat Task", noTasks: "Belum ada task aktif.", done: "Selesai", review: "Direview", rejected: "Ditolak", joinClaim: "Gabung & Klaim", claimBtn: "Klaim",
     tasksNote: "Task gabung Telegram diverifikasi otomatis. Task lain direview admin sebelum reward dibayar.",
-    invite: "Undang teman", inviteText: "Per teman yang bergabung dan melakukan claim mining pertamanya, ditambah 21% dari setiap reward mining mereka. Bonus 21% adalah tambahan — tidak mengurangi reward teman Anda.",
+    invite: "Undang teman", inviteText: "Dapat 2,1 BYC per teman yang bergabung dan melakukan claim mining pertamanya, ditambah 21% dari setiap reward mining mereka. Bonus 21% adalah tambahan — tidak mengurangi reward teman Anda.",
     friends: "Teman", earned: "Diperoleh", setBot: "Isi NEXT_PUBLIC_TELEGRAM_BOT_USERNAME untuk mengaktifkan", copy: "Salin link referral", copied: "Link referral disalin.", share: "BAGIKAN", shareText: "Ayo mining BYC bersamaku di Telegram!",
     tonWallet: "Wallet TON", walletInfo: "Hubungkan dengan TON Connect. Anda hanya menandatangani bukti gratis — tanpa biaya dan tanpa pembayaran.",
     connect: "HUBUNGKAN WALLET TON", manage: "KELOLA WALLET", verified: "✓ terverifikasi", notVerified: "Sesi wallet ini belum terverifikasi. Hubungkan ulang untuk menandatangani bukti.", reconnect: "HUBUNGKAN ULANG & VERIFIKASI",
@@ -29,6 +29,10 @@ export const T: Record<Lang, Dict> = {
     success: "Berhasil.", walletVerified: "Wallet terverifikasi.",
     err_hold: "Wallet Anda harus menyimpan minimal 21% dari jumlah penarikan dalam BYC. Beli BYC di tab Swap terlebih dulu.",
     err_min: "Minimum penarikan adalah 21 BYC.", err_wallet: "Hubungkan dan verifikasi wallet TON terlebih dulu.",
+    err_active: "Sesi mining masih aktif.", err_pool: "Pool reward sudah habis.", err_notfinished: "Sesi mining belum selesai.",
+    err_nosession: "Tidak ada sesi mining aktif.", err_claimed: "Task sudah pernah diklaim.", err_limit: "Kuota reward task sudah penuh.",
+    err_nobyc: "Wallet ini belum memegang BYC.", err_balance: "Saldo tidak cukup.", err_invalid: "Jumlah tidak valid.",
+    err_joinfirst: "Bergabung ke channel/grup dulu, lalu tekan Klaim lagi.", err_linked: "Wallet ini sudah terhubung ke akun lain.",
     ob1t: "Selamat datang di BYTCOIN", ob1: "Mining BYC langsung dari Telegram. Hubungkan wallet TON — tanpa biaya verifikasi.",
     ob2t: "Mining tiap jam", ob2: "2,1 BYC per hari lewat sesi 1 jam: Start, tunggu 1 jam, Claim, lalu Start lagi.",
     ob3t: "Tarik ke wallet Anda", ob3: "Minimum 21 BYC, wallet menyimpan 21% dari jumlah tarik, biaya penarikan 10%. Baca whitepaper untuk detail.",
@@ -45,7 +49,7 @@ export const T: Record<Lang, Dict> = {
     cycle: "Mining cycle", poolLeft: "Pool left", whitepaper: "Read Whitepaper",
     tasks: "Task Center", noTasks: "No active tasks yet.", done: "Done", review: "In review", rejected: "Rejected", joinClaim: "Join & Claim", claimBtn: "Claim",
     tasksNote: "Telegram-join tasks are verified automatically. Other tasks are reviewed by an admin before the reward is paid.",
-    invite: "Invite friends", inviteText: "Per friend who joins and completes their first mining claim, plus 21% of every mining reward they claim. The 21% is extra — it is not taken from your friend.",
+    invite: "Invite friends", inviteText: "Get 2.1 BYC per friend who joins and completes their first mining claim, plus 21% of every mining reward they claim. The 21% is extra — it is not taken from your friend.",
     friends: "Friends", earned: "Earned", setBot: "Set NEXT_PUBLIC_TELEGRAM_BOT_USERNAME to enable", copy: "Copy referral link", copied: "Referral link copied.", share: "SHARE", shareText: "Mine BYC with me on Telegram!",
     tonWallet: "TON Wallet", walletInfo: "Connect with TON Connect. You only sign a free proof — no fee and no payment.",
     connect: "CONNECT TON WALLET", manage: "MANAGE WALLET", verified: "✓ verified", notVerified: "This wallet session is not verified yet. Reconnect to sign the proof.", reconnect: "RECONNECT & VERIFY",
@@ -61,6 +65,10 @@ export const T: Record<Lang, Dict> = {
     success: "Success.", walletVerified: "Wallet verified.",
     err_hold: "Your wallet must hold at least 21% of the withdrawal amount in BYC. Buy BYC in the Swap tab first.",
     err_min: "Minimum withdrawal is 21 BYC.", err_wallet: "Connect and verify your TON wallet first.",
+    err_active: "A mining session is already active.", err_pool: "The reward pool is exhausted.", err_notfinished: "The mining session has not finished.",
+    err_nosession: "No active mining session.", err_claimed: "Task already claimed.", err_limit: "Task reward limit reached.",
+    err_nobyc: "This wallet holds no BYC.", err_balance: "Insufficient balance.", err_invalid: "Invalid amount.",
+    err_joinfirst: "Join the channel/group first, then press Claim again.", err_linked: "This wallet is already linked to another account.",
     ob1t: "Welcome to BYTCOIN", ob1: "Mine BYC right from Telegram. Connect your TON wallet — no verification fee.",
     ob2t: "Hourly mining", ob2: "2.1 BYC per day through 1-hour sessions: Start, wait 1 hour, Claim, then Start again.",
     ob3t: "Withdraw to your wallet", ob3: "Minimum 21 BYC, your wallet holds 21% of the amount, 10% withdrawal fee. Read the whitepaper for details.",
@@ -70,9 +78,23 @@ export const T: Record<Lang, Dict> = {
 
 export function translateError(msg: string, lang: Lang): string {
   const d = T[lang];
-  if (/must hold at least 21/i.test(msg)) return d.err_hold;
-  if (/Minimum withdrawal/i.test(msg)) return d.err_min;
-  if (/Connect (and verify )?your TON wallet/i.test(msg)) return d.err_wallet;
+  const rules: [RegExp, string][] = [
+    [/must hold at least 21/i, d.err_hold],
+    [/Minimum withdrawal/i, d.err_min],
+    [/Connect (and verify )?your TON wallet/i, d.err_wallet],
+    [/active mining session/i, d.err_active],
+    [/pool is exhausted/i, d.err_pool],
+    [/has not finished/i, d.err_notfinished],
+    [/No active mining session/i, d.err_nosession],
+    [/already claimed/i, d.err_claimed],
+    [/reward limit/i, d.err_limit],
+    [/holds no BYC/i, d.err_nobyc],
+    [/Insufficient/i, d.err_balance],
+    [/Invalid amount/i, d.err_invalid],
+    [/Join the channel/i, d.err_joinfirst],
+    [/already linked/i, d.err_linked]
+  ];
+  for (const [re, out] of rules) if (re.test(msg)) return out;
   return msg;
 }
 

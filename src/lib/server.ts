@@ -13,7 +13,9 @@ export async function getTelegramUser() {
   const h = await headers();
   const initData = h.get("x-telegram-init-data") || "";
   const token = process.env.TELEGRAM_BOT_TOKEN || "";
-  return verifyTelegramInitData(initData, token);
+  const user = verifyTelegramInitData(initData, token);
+  if (typeof user.id !== "number" || !Number.isSafeInteger(user.id)) throw new Error("Telegram user missing.");
+  return user;
 }
 
 export function isAdmin(telegramId: number) {
@@ -25,4 +27,14 @@ export const errMsg = (e: unknown, fallback: string) => {
   if (e instanceof Error) return e.message;
   if (e && typeof e === "object" && "message" in e) return String((e as { message: unknown }).message);
   return fallback;
+};
+
+// Seperti errMsg, tetapi menyembunyikan detail konfigurasi/infrastruktur dari klien.
+export const safeErr = (e: unknown, fallback: string) => {
+  const m = errMsg(e, fallback);
+  if (/not configured|environment is missing|TON API error|fetch failed|ECONN|ETIMEDOUT/i.test(m)) {
+    console.error("[server]", m);
+    return fallback;
+  }
+  return m;
 };
