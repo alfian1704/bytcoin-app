@@ -386,4 +386,46 @@ export function MiniApp() {
       <div className="card">{profile.withdrawals.map(w => <div className="task" key={w.id}>
         <div style={{ flex: 1 }}>
           <b>{fromNano(w.amount_nano)} BYC</b>
-          <div className="sub">{t.wdPreview}: {fro
+                    <div className="sub">{t.wdPreview}: {fromNano(w.net_nano)} · {new Date(w.created_at).toLocaleDateString(lang === "id" ? "id-ID" : "en-US")}</div>
+          {w.tx_hash ? <small className="gold" style={{ wordBreak: "break-all" }}>{w.tx_hash}</small> : null}
+        </div>
+        <span className="pill">{STATUS[lang][w.status] || w.status}</span>
+      </div>)}</div>
+    </> : null}
+  </>;
+
+  const views: Record<string, React.ReactNode> = { home, mining, tasks: tasksView, referral, swap: swapView, wallet: walletView };
+
+  const onboardSteps = [[t.ob1t, t.ob1], [t.ob2t, t.ob2], [t.ob3t, t.ob3]];
+
+  return <>
+    {onboard !== null ? <div className="splash"><div style={{ maxWidth: 360, padding: 24 }}>
+      <div className="coin">B</div>
+      <h2 className="gold">{onboardSteps[onboard][0]}</h2>
+      <p className="sub">{onboardSteps[onboard][1]}</p>
+      <div className="dots">{onboardSteps.map((_, i) => <i key={i} className={i === onboard ? "on" : ""} />)}</div>
+      <button className="primary" onClick={() => onboard >= onboardSteps.length - 1 ? finishOnboard() : setOnboard(onboard + 1)}>
+        {onboard >= onboardSteps.length - 1 ? t.begin : t.next}</button>
+      <p><button className="lang" onClick={finishOnboard}>{t.skip}</button></p>
+    </div></div> : null}
+
+    <main className="app">
+      <header className="top">
+        <div className="brand"><div className="coin">B</div><div><strong>BYTCOIN</strong><small>$BYC</small></div></div>
+        <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+          {isAdminUser ? <a className="pill" href="/admin">Admin</a> : null}
+          <button className="lang" onClick={switchLang}>{lang === "id" ? "EN" : "ID"}</button>
+        </div>
+      </header>
+
+      {note ? <div className={`notice ${note.ok ? "success" : "error"}`} onClick={() => notify("")}>{note.text}</div> : null}
+
+      {views[tab]}
+    </main>
+
+    <nav className="nav">
+      {NAV.map(n => <button key={n.id} className={tab === n.id ? "active" : ""} onClick={() => { setTab(n.id); notify(""); }}>
+        <span>{n.icon}</span>{T[lang][`nav_${n.id}`] || n.label}</button>)}
+    </nav>
+  </>;
+}
