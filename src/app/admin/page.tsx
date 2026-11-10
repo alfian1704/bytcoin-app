@@ -1,6 +1,6 @@
 "use client";
-import AdminTaskManager from "@/components/AdminTaskManager";
+import nextDynamic from "next/dynamic";
 
-export default function AdminPage() {
-  return <AdminTaskManager />;
-}
+const AdminTaskManager = nextDynamic(() => import("@/components/AdminTaskManager"), { ssr: false, loading: () => null });
+
+export default function AdminPage() { return <AdminTaskManager />; }
