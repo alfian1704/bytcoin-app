@@ -13,6 +13,7 @@
     "@ston-fi/sdk": "latest",
     "@supabase/supabase-js": "^2.57.0",
     "@ton/core": "latest",
+    "@ton/crypto": "^3.3.0",
     "@ton/ton": "latest",
     "@tonconnect/ui-react": "^2.3.0",
     "@twa-dev/sdk": "^8.0.2",
