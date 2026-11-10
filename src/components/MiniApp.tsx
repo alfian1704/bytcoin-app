@@ -96,14 +96,29 @@ export function MiniApp() {
       notify(translateError(e instanceof Error ? e.message : "Unable to load account", langRef.current));
     }
   }, [initData, headers]);
+    }, [initData, headers]);
   useEffect(() => { load(); }, [load]);
 
-  // Tampilkan tautan Admin hanya jika server mengizinkan akun ini.
+  useEffect(() => {
+    (async () => {
+      try {
+        await tonUI.connectionRestored;
+      } catch {}
+    })();
+  }, [tonUI]);
+
+  useEffect(() => {
+    if (!session) return;
+    if (remaining <= 0) return;
+    const id = setInterval(() => load(), 3000);
+    return () => clearInterval(id);
+  }, [session, remaining, load]);
+
+  // Show admin link only if server allows
   useEffect(() => {
     if (!initData) return;
     fetch("/api/admin/tasks", { headers }).then(r => setIsAdminUser(r.ok)).catch(() => setIsAdminUser(false));
   }, [initData, headers]);
-
   // ---------- TON Connect + TON Proof ----------
   const refreshPayload = useCallback(async () => {
     try {
