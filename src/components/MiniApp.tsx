@@ -142,7 +142,7 @@ export function MiniApp() {
     let selectedLang: Lang | null = null;
 
     try {
-      const savedLang = localStorage.getItem("byc_lang");
+      const savedLang = localStorage.getItem("BYT_lang");
 
       if (savedLang === "id" || savedLang === "en") {
         selectedLang = savedLang;
@@ -160,7 +160,7 @@ export function MiniApp() {
     setLang(selectedLang);
 
     try {
-      if (!localStorage.getItem("byc_onboarded")) {
+      if (!localStorage.getItem("BYT_onboarded")) {
         setOnboard(0);
       }
     } catch {}
@@ -186,13 +186,13 @@ export function MiniApp() {
     setLang(nextLang);
 
     try {
-      localStorage.setItem("byc_lang", nextLang);
+      localStorage.setItem("BYT_lang", nextLang);
     } catch {}
   };
 
   const finishOnboard = () => {
     try {
-      localStorage.setItem("byc_onboarded", "1");
+      localStorage.setItem("BYT_onboarded", "1");
     } catch {}
 
     setOnboard(null);
@@ -551,7 +551,7 @@ export function MiniApp() {
         }
 
         if (BigInt(data.balance) < quote.total) {
-          throw new Error("Insufficient BYC in wallet");
+          throw new Error("Insufficient BYT in wallet");
         }
 
         jettonWallet = data.walletAddress;
@@ -665,7 +665,7 @@ export function MiniApp() {
     >
       <span className="pill">⛏️ {TOKEN.symbol}</span>
       <span className="pill">
-        ⚡ {rateText} BYC{t.perHour}
+        ⚡ {rateText} BYT{t.perHour}
       </span>
     </div>
   );
@@ -675,7 +675,7 @@ export function MiniApp() {
       <div className="card">
         <div className="label">{t.balance}</div>
         <div className="balance gold">
-          {fromNano(profile.balance_nano)} <small>BYC</small>
+          {fromNano(profile.balance_nano)} <small>BYT</small>
         </div>
         <div className="sub">{t.balanceSub}</div>
       </div>
@@ -763,8 +763,8 @@ export function MiniApp() {
           style={{ textAlign: "center", marginTop: 8 }}
         >
           {t.rate}: {fromNano(profile.mining_rate_nano)}
-          BYC{t.perHour} · {t.poolLeft}:{" "}
-          {fromNano(profile.pool_remaining_nano)} BYC
+          BYT{t.perHour} · {t.poolLeft}:{" "}
+          {fromNano(profile.pool_remaining_nano)} BYT
         </p>
 
         {miningButton}
@@ -801,7 +801,7 @@ export function MiniApp() {
                   ) : null}
 
                   <small className="gold">
-                    +{fromNano(task.reward_nano)} BYC
+                    +{fromNano(task.reward_nano)} BYT
                   </small>
                 </div>
 
@@ -913,7 +913,7 @@ export function MiniApp() {
           </div>
 
           <div className="label">
-            {side === "buy" ? t.youPayTon : t.youSellByc}
+            {side === "buy" ? t.youPayTon : t.youSellBYT}
           </div>
 
           <input
@@ -949,7 +949,7 @@ export function MiniApp() {
                 <span>{t.fee}</span>
                 <b>
                   {fromNano(quote.fee)}{" "}
-                  {side === "buy" ? "TON" : "BYC"}
+                  {side === "buy" ? "TON" : "BYT"}
                 </b>
               </div>
 
@@ -957,7 +957,7 @@ export function MiniApp() {
                 <span>{t.swapped}</span>
                 <b>
                   {fromNano(quote.swapAmount)}{" "}
-                  {side === "buy" ? "TON" : "BYC"}
+                  {side === "buy" ? "TON" : "BYT"}
                 </b>
               </div>
 
@@ -965,7 +965,7 @@ export function MiniApp() {
                 <span>{t.estReceive}</span>
                 <b>
                   {fromNano(quote.askUnits)}{" "}
-                  {side === "buy" ? "BYC" : "TON"}
+                  {side === "buy" ? "BYT" : "TON"}
                 </b>
               </div>
 
@@ -973,7 +973,7 @@ export function MiniApp() {
                 <span>{t.minReceive}</span>
                 <b>
                   {fromNano(quote.minAskUnits)}{" "}
-                  {side === "buy" ? "BYC" : "TON"}
+                  {side === "buy" ? "BYT" : "TON"}
                 </b>
               </div>
 
@@ -1085,13 +1085,13 @@ style={{ margin: "12px 0" }}>
           <div style={{ marginBottom: 12 }}>
             <div className="row sub">
               <span>{t.wdFee}</span>
-              <b>{fromNano(wdFee.toString())} BYC</b>
+              <b>{fromNano(wdFee.toString())} BYT</b>
  </div>
 
             <div className="row sub">
               <span>{t.wdPreview}</span>
               <b className="gold">
-                {fromNano((wdAmt - wdFee).toString())} BYC
+                {fromNano((wdAmt - wdFee).toString())} BYT
               </b>
             </div>
           </div>
@@ -1121,7 +1121,7 @@ style={{ margin: "12px 0" }}>
               <div className="task" key={withdrawal.id}>
                 <div style={{ flex: 1 }}>
                   <b>
-                    {fromNano(withdrawal.amount_nano)} BYC
+                    {fromNano(withdrawal.amount_nano)} BYT
                   </b>
 
                   <div className="sub">
@@ -1224,7 +1224,7 @@ style={{ margin: "12px 0" }}>
 
             <div>
               <strong>BYTCOIN</strong>
-              <small>$BYC</small>
+              <small>$BYT</small>
             </div>
           </div>
 

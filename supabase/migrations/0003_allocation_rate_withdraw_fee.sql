@@ -1,15 +1,15 @@
--- BYTCOIN 0003: allocation (miner/community pool 10.5M = 50%), mining 2.1 BYC/day (0.0875/hour),
+-- BYTCOIN 0003: allocation (miner/community pool 10.5M = 50%), mining 2.1 BYT/day (0.0875/hour),
 -- withdrawal fee 10% retained by treasury. Safe to re-run.
 
--- Mining speed: 2.1 BYC / 24 h = 0.0875 BYC per hour = 87,500,000 nanoBYC. Sessions stay 1 hour (start -> claim -> start).
+-- Mining speed: 2.1 BYT / 24 h = 0.0875 BYT per hour = 87,500,000 nanoBYT. Sessions stay 1 hour (start -> claim -> start).
 update public.app_settings
    set value = '{"duration_seconds":3600,"base_reward_nano_per_hour":"87500000"}'::jsonb, updated_at = now()
  where key = 'mining';
 
--- Community/miner pool: 10,500,000 BYC (50% of 21,000,000). Never lowered below what is already issued.
+-- Community/miner pool: 10,500,000 BYT (50% of 21,000,000). Never lowered below what is already issued.
 update public.reward_pool set cap_nano = 10500000000000000 where id = 1 and issued_nano <= 10500000000000000;
 
--- Withdrawal: min 21 BYC, wallet must hold 21% of the amount, 10% fee deducted from the withdrawn amount.
+-- Withdrawal: min 21 BYT, wallet must hold 21% of the amount, 10% fee deducted from the withdrawn amount.
 update public.app_settings
    set value = '{"minimum_nano":"21000000000","holding_bps":2100,"fee_bps":1000}'::jsonb, updated_at = now()
  where key = 'withdrawal';
@@ -32,11 +32,11 @@ begin
   min_n   := coalesce((st->>'minimum_nano')::numeric, 21000000000);
   bps     := coalesce((st->>'holding_bps')::numeric, 2100);
   fee_bps := coalesce((st->>'fee_bps')::numeric, 1000);
-  if p_amount_nano < min_n then raise exception 'Minimum withdrawal is 21 BYC'; end if;
+  if p_amount_nano < min_n then raise exception 'Minimum withdrawal is 21 BYT'; end if;
   if p.balance_nano < p_amount_nano then raise exception 'Insufficient internal balance'; end if;
   required := ceil(p_amount_nano * bps / 10000);
   if p_onchain_balance_nano < required then
-    raise exception 'Your connected wallet must hold at least 21%% of the withdrawal amount in BYC (% nanoBYC required). Buy BYC in the Swap tab first.', required;
+    raise exception 'Your connected wallet must hold at least 21%% of the withdrawal amount in BYT (% nanoBYT required). Buy BYT in the Swap tab first.', required;
   end if;
   fee := floor(p_amount_nano * fee_bps / 10000);     -- retained by treasury (never sent)
   net := p_amount_nano - fee;                         -- what the admin sends to the user

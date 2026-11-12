@@ -16,12 +16,12 @@ export async function getWalletPublicKey(rawAddress: string): Promise<string | n
   return typeof j.public_key === "string" ? j.public_key.toLowerCase() : null;
 }
 
-/** On-chain BYC balance (nanoBYC) and the owner's jetton-wallet address. Balance 0 / wallet null if the owner holds none. */
-export async function getByCInfo(ownerAddress: string): Promise<{ balance: bigint; walletAddress: string | null }> {
+/** On-chain BYT balance (nanoBYT) and the owner's jetton-wallet address. Balance 0 / wallet null if the owner holds none. */
+export async function getBYTInfo(ownerAddress: string): Promise<{ balance: bigint; walletAddress: string | null }> {
   const r = await fetch(`${base()}/v2/accounts/${encodeURIComponent(ownerAddress)}/jettons/${encodeURIComponent(JETTON_MASTER)}`, { headers: headers(), cache: "no-store" });
   if (r.status === 404) return { balance: 0n, walletAddress: null };
   if (!r.ok) throw new Error(`TON API error (${r.status}).`);
   const j = await r.json();
   return { balance: BigInt(String(j.balance ?? "0")), walletAddress: j.wallet_address?.address ?? null };
 }
-export async function getByCBalanceNano(ownerAddress: string): Promise<bigint> { return (await getByCInfo(ownerAddress)).balance; }
+export async function getBYTBalanceNano(ownerAddress: string): Promise<bigint> { return (await getBYTInfo(ownerAddress)).balance; }

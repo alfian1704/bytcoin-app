@@ -48,7 +48,7 @@ export default function TasksPanel() {
       <input placeholder="slug (huruf kecil, tanpa spasi), contoh: join-channel" value={f.slug} onChange={e => setF({ ...f, slug: e.target.value })} />
       <input placeholder="Judul" value={f.title} onChange={e => setF({ ...f, title: e.target.value })} />
       <input placeholder="Deskripsi" value={f.description} onChange={e => setF({ ...f, description: e.target.value })} />
-      <input inputMode="decimal" placeholder="Reward dalam BYC, contoh: 0.21" value={f.reward} onChange={e => setF({ ...f, reward: e.target.value })} />
+      <input inputMode="decimal" placeholder="Reward dalam BYT, contoh: 0.21" value={f.reward} onChange={e => setF({ ...f, reward: e.target.value })} />
       <select style={selectStyle} value={f.task_type} onChange={e => setF({ ...f, task_type: e.target.value })}>
         <option value="telegram_join">telegram_join (otomatis)</option>
         <option value="manual">manual (direview admin)</option>
@@ -63,7 +63,7 @@ export default function TasksPanel() {
         <div style={{ flex: 1 }}>
           <b>{t.title}</b>
           <div className="sub">{t.slug} · {t.task_type}</div>
-          <small className="gold">+{fromNano(t.reward_nano)} BYC</small>
+          <small className="gold">+{fromNano(t.reward_nano)} BYT</small>
         </div>
         <button className="secondary" style={{ width: "auto" }} disabled={busy} onClick={() => toggle(t)}>{t.active ? "Nonaktifkan" : "Aktifkan"}</button>
       </div>) : <p className="sub">Belum ada task.</p>}

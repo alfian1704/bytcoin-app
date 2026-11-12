@@ -1,23 +1,23 @@
 // ---- Token (jetton master already deployed & minting revoked) ----
 export const JETTON_MASTER =
-  process.env.NEXT_PUBLIC_BYC_JETTON_MASTER ||
+  process.env.NEXT_PUBLIC_BYT_JETTON_MASTER ||
   "EQA6Jr9Lp2oSryYX89zX8heE9rM7_35p69uDD9RrSaEP-1Dx";
 
 const NANO = 1_000_000_000n;
 export const TOKEN = {
   name: "BYTCOIN",
-  symbol: "BYC",
+  symbol: "BYT",
   decimals: 9,
-  maxSupply: 21_000_000n * NANO,            // 21,000,000 BYC (matches on-chain max supply)
-  minWithdrawalNano: 21n * NANO,            // 21 BYC
+  maxSupply: 21_000_000n * NANO,            // 21,000,000 BYT (matches on-chain max supply)
+  minWithdrawalNano: 21n * NANO,            // 21 BYT
   withdrawalHoldingBps: 2100,               // wallet must hold 21% of the withdrawal amount
-  referralBonusNano: 2_100_000_000n,        // 2.1 BYC (display only; DB setting is authoritative)
+  referralBonusNano: 2_100_000_000n,        // 2.1 BYT (display only; DB setting is authoritative)
   referralMiningBps: 2100,                  // +21% of a friend's mining reward (display only)
   withdrawFeeBps: 1000,                     // 10% (display only; DB setting is authoritative)
   buyFeeBps: 100,                           // 1% on buy (TON input)  -> fee wallet
-  sellFeeBps: 200                           // 2% on sell (BYC input) -> fee wallet
+  sellFeeBps: 200                           // 2% on sell (BYT input) -> fee wallet
 };
-export const MINING_PER_DAY_NANO = 2_100_000_000n; // 2.1 BYC/day (hourly sessions: 0.0875 BYC/hour)
+export const MINING_PER_DAY_NANO = 2_100_000_000n; // 2.1 BYT/day (hourly sessions: 0.0875 BYT/hour)
 export const ALLOCATION = [
   { key: "miner", amount: 10_500_000, pct: 50 },
   { key: "team", amount: 2_100_000, pct: 10 },
@@ -36,7 +36,7 @@ export const NAV = [
   { id: "wallet", label: "Wallet", icon: "◇" }
 ] as const;
 
-// ---- nanoBYC helpers (string/BigInt only, never floats) ----
+// ---- nanoBYT helpers (string/BigInt only, never floats) ----
 export function fromNano(v: string | number | bigint | null | undefined): string {
   if (v === null || v === undefined || v === "") return "0";
   let n: bigint;

@@ -1,12 +1,12 @@
--- BYTCOIN 0002: TON Proof wallet binding, 21M supply, emission pool, referral 2.1 BYC + 21%,
--- withdrawal (min 21 BYC, wallet must hold 21%), task claims, admin RPCs.
+-- BYTCOIN 0002: TON Proof wallet binding, 21M supply, emission pool, referral 2.1 BYT + 21%,
+-- withdrawal (min 21 BYT, wallet must hold 21%), task claims, admin RPCs.
 -- Safe to re-run.
 
 alter table public.profiles add column if not exists wallet_verified_at timestamptz;
 create unique index if not exists profiles_wallet_unique on public.profiles(connected_wallet) where connected_wallet is not null;
 
--- Emission pool: total BYC the app may ever credit internally (mining + referral + tasks).
--- 12,600,000 BYC = 60% of the 21,000,000 supply. Change cap_nano if you want another split.
+-- Emission pool: total BYT the app may ever credit internally (mining + referral + tasks).
+-- 12,600,000 BYT = 60% of the 21,000,000 supply. Change cap_nano if you want another split.
 create table if not exists public.reward_pool (
   id int primary key check (id = 1),
   cap_nano numeric(40,0) not null,
@@ -19,7 +19,7 @@ insert into public.reward_pool(id, cap_nano) values (1, 12600000000000000) on co
 insert into public.app_settings(key, value) values
  ('mining',     '{"duration_seconds":3600,"base_reward_nano_per_hour":"1"}'),
  ('withdrawal', '{"minimum_nano":"21000000000","holding_bps":2100}'),
- ('token',      '{"name":"BYTCOIN","symbol":"BYC","decimals":9,"max_supply_nano":"21000000000000000","jetton_master":"EQA6Jr9Lp2oSryYX89zX8heE9rM7_35p69uDD9RrSaEP-1Dx"}'),
+ ('token',      '{"name":"BYTCOIN","symbol":"BYT","decimals":9,"max_supply_nano":"21000000000000000","jetton_master":"EQA6Jr9Lp2oSryYX89zX8heE9rM7_35p69uDD9RrSaEP-1Dx"}'),
  ('referral',   '{"signup_bonus_nano":"2100000000","mining_share_bps":2100}')
 on conflict (key) do update set value = excluded.value, updated_at = now();
 
@@ -157,11 +157,11 @@ begin
   select value into st from public.app_settings where key = 'withdrawal';
   min_n := coalesce((st->>'minimum_nano')::numeric, 21000000000);
   bps   := coalesce((st->>'holding_bps')::numeric, 2100);
-  if p_amount_nano < min_n then raise exception 'Minimum withdrawal is % nanoBYC', min_n; end if;
+  if p_amount_nano < min_n then raise exception 'Minimum withdrawal is % nanoBYT', min_n; end if;
   if p.balance_nano < p_amount_nano then raise exception 'Insufficient internal balance'; end if;
   required := ceil(p_amount_nano * bps / 10000);
   if p_onchain_balance_nano < required then
-    raise exception 'Your connected wallet must hold at least 21%% of the withdrawal amount in BYC (% nanoBYC required)', required;
+    raise exception 'Your connected wallet must hold at least 21%% of the withdrawal amount in BYT (% nanoBYT required)', required;
   end if;
   update public.profiles set balance_nano = balance_nano - p_amount_nano, updated_at = now() where telegram_id = p_telegram_id;
   insert into public.withdrawals(telegram_id, amount_nano, destination_wallet) values (p_telegram_id, p_amount_nano, p.connected_wallet) returning * into w;

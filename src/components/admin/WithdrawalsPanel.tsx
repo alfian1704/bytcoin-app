@@ -50,8 +50,8 @@ export default function WithdrawalsPanel() {
       {FILTERS.map(x => <button key={x} className={filter === x ? "on" : ""} onClick={() => setFilter(x)}>{x}</button>)}
     </div>
     {rows.length ? rows.map(w => <div className="card" key={w.id}>
-      <div className="row"><b>{fromNano(w.amount_nano)} BYC</b><span className="pill">{w.status}</span></div>
-      <p className="sub">Kirim (net): <b className="gold">{fromNano(w.net_nano ?? w.amount_nano)} BYC</b> · fee {fromNano(w.fee_nano)}</p>
+      <div className="row"><b>{fromNano(w.amount_nano)} BYT</b><span className="pill">{w.status}</span></div>
+      <p className="sub">Kirim (net): <b className="gold">{fromNano(w.net_nano ?? w.amount_nano)} BYT</b> · fee {fromNano(w.fee_nano)}</p>
       <p className="sub" style={{ wordBreak: "break-all" }}>User {w.telegram_id}<br />Wallet: {w.destination_wallet}</p>
       <p className="sub">{new Date(w.created_at).toLocaleString()}</p>
       <button className="secondary" onClick={() => open(`https://tonviewer.com/${w.destination_wallet}`)}>Cek wallet di Tonviewer</button>

@@ -36,7 +36,7 @@ export default function ClaimsPanel() {
         <div style={{ flex: 1 }}>
           <b>{titleOf(c)}</b>
           <div className="sub">User {c.telegram_id} · {new Date(c.created_at).toLocaleString()}</div>
-          <small className="gold">+{fromNano(c.reward_nano)} BYC</small>
+          <small className="gold">+{fromNano(c.reward_nano)} BYT</small>
         </div>
         <div style={{ display: "grid", gap: 6 }}>
           <button className="primary" style={{ padding: "8px 12px" }} disabled={busy} onClick={() => review(c.id, true)}>Setujui</button>

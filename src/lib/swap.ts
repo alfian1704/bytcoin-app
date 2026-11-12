@@ -1,6 +1,6 @@
 // @ts-nocheck
 // Client-only swap module (STON.fi DEX v2). Loaded with dynamic import() only when the Swap tab is used,
-// so a problem here can never break the rest of the app. UNTESTED until a BYC pool exists — see README.
+// so a problem here can never break the rest of the app. UNTESTED until a BYT pool exists — see README.
 import { StonApiClient } from "@ston-fi/api";
 import { Client, dexFactory } from "@ston-fi/sdk";
 import { Address, beginCell, toNano } from "@ton/core";
@@ -10,7 +10,7 @@ export type Side = "buy" | "sell";
 const api = new StonApiClient();
 
 export function splitFee(side: Side, total: bigint) {
-  const bps = BigInt(side === "buy" ? TOKEN.buyFeeBps : TOKEN.sellFeeBps);   // 1% buy (TON) / 2% sell (BYC)
+  const bps = BigInt(side === "buy" ? TOKEN.buyFeeBps : TOKEN.sellFeeBps);   // 1% buy (TON) / 2% sell (BYT)
   const fee = (total * bps) / 10000n;
   return { fee, swapAmount: total - fee };
 }
@@ -46,7 +46,7 @@ export async function executeSwap({ quote, userAddress, jettonWallet, tonUI }) {
     } else {
       const body = beginCell().storeUint(0xf8a7ea5, 32).storeUint(BigInt(Date.now()), 64).storeCoins(fee)
         .storeAddress(Address.parse(FEE_WALLET)).storeAddress(Address.parse(userAddress)).storeBit(0).storeCoins(0).storeBit(0).endCell();
-      messages.push({ address: jettonWallet, amount: toNano("0.05").toString(), payload: body.toBoc().toString("base64") }); // 2% in BYC
+      messages.push({ address: jettonWallet, amount: toNano("0.05").toString(), payload: body.toBoc().toString("base64") }); // 2% in BYT
     }
   }
   messages.push({ address: txParams.to.toString(), amount: txParams.value.toString(), payload: txParams.body?.toBoc().toString("base64") });

@@ -185,9 +185,9 @@ alter table public.audit_logs enable row level security;
 -- only after validating Telegram initData. Never expose the service key.
 
 insert into public.app_settings(key,value) values
- ('mining', '{"duration_seconds":3600,"base_reward_nano_per_hour":"1000000000","holding_extra_nano_per_whole_byc_per_hour":"1","extra_cap_nano_per_hour":"1000000000"}'),
+ ('mining', '{"duration_seconds":3600,"base_reward_nano_per_hour":"1000000000","holding_extra_nano_per_whole_BYT_per_hour":"1","extra_cap_nano_per_hour":"1000000000"}'),
  ('withdrawal', '{"minimum_nano":"2100000000000","holding_bps":1000}'),
- ('token', '{"name":"BYTCOIN","symbol":"BYC","decimals":9,"max_supply_nano":"21000000000000000000"}'),
+ ('token', '{"name":"BYTCOIN","symbol":"BYT","decimals":9,"max_supply_nano":"21000000000000000000"}'),
  ('post_mining', '{"holder_share_bps":5000,"buyback_burn_share_bps":5000,"holding_days":30,"enabled":false}')
 on conflict(key) do nothing;
 
@@ -253,7 +253,7 @@ declare p public.profiles%rowtype; w public.withdrawals%rowtype; min_n numeric; 
 begin
   select * into p from public.profiles where telegram_id=p_telegram_id for update;
   if not found then raise exception 'Profile not found'; end if;
-  if p_amount_nano < 2100000000000 then raise exception 'Minimum withdrawal is 2,100 BYC'; end if;
+  if p_amount_nano < 2100000000000 then raise exception 'Minimum withdrawal is 2,100 BYT'; end if;
   if p.balance_nano < p_amount_nano then raise exception 'Insufficient internal balance'; end if;
   select (value->>'minimum_nano')::numeric,(value->>'holding_bps')::integer
     into min_n,holding_bps from public.app_settings where key='withdrawal';

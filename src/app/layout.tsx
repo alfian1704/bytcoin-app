@@ -3,7 +3,7 @@ import "./globals.css";
 import { TonProvider } from "@/components/TonProvider";
 
 export const metadata: Metadata = {
-  title: "BYTCOIN — $BYC",
+  title: "BYTCOIN — $BYT",
   description: "BYTCOIN Telegram Mining Mini App",
   manifest: "/manifest.json"
 };

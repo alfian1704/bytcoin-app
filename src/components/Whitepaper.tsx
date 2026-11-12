@@ -5,8 +5,8 @@ import { WP, type Lang } from "@/lib/i18n";
 
 export function Whitepaper() {
   const [lang, setLang] = useState<Lang>("id");
-  useEffect(() => { try { const l = localStorage.getItem("byc_lang"); if (l === "en" || l === "id") setLang(l); } catch {} }, []);
-  const switchLang = (l: Lang) => { setLang(l); try { localStorage.setItem("byc_lang", l); } catch {} };
+  useEffect(() => { try { const l = localStorage.getItem("BYT_lang"); if (l === "en" || l === "id") setLang(l); } catch {} }, []);
+  const switchLang = (l: Lang) => { setLang(l); try { localStorage.setItem("BYT_lang", l); } catch {} };
   const d = WP[lang];
   return <main className="app wp">
     <header className="top"><div className="brand"><div className="coin">B</div><div><strong>BYTCOIN</strong><small>WHITEPAPER</small></div></div>
