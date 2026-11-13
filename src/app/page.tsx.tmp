@@ -1,6 +1,16 @@
 "use client";
-import nextDynamic from "next/dynamic";
 
-const MiniApp = nextDynamic(() => import("@/components/MiniApp").then((m) => m.MiniApp), { ssr: false, loading: () => null });
+import dynamic from "next/dynamic";
 
-export default function Home() { return <MiniApp />; }
+const MiniApp = dynamic(() => import("@/components/MiniApp"), { 
+  ssr: false,
+  loading: () => (
+    <div className="flex items-center justify-center min-h-screen bg-black">
+      <img src="/logo-byt.png" alt="BYT" className="w-24 h-24 animate-pulse" />
+    </div>
+  )
+});
+
+export default function Home() {
+  return <MiniApp />;
+}
